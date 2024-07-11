@@ -19,6 +19,7 @@ export default [
         name: 'login',
         path: '/user/login',
         component: './User/Login',
+        // redirect:'/admin/sub-page'
       },
     ],
   },
@@ -26,8 +27,8 @@ export default [
     path: '/admin',
     name: 'admin',
     icon: 'crown',
-    access: 'canAdmin',
-   
+    // access: 'Boss1',  //设置谁能进入这个页面的
+
     routes: [
       {
         path: '/admin',

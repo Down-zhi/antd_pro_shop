@@ -32,7 +32,6 @@ export const errorConfig: RequestConfig = {
       const { success, data, errorCode, errorMessage, showType } =
         res as unknown as ResponseStructure;
       if (!success) {
-        
         const error: any = new Error(errorMessage);
         // console.log('erroe------'+ error);
         // console.log('data------'+ data);
@@ -42,8 +41,6 @@ export const errorConfig: RequestConfig = {
         error.name = 'BizError';
         error.info = { errorCode, errorMessage, showType, data };
         throw error; // 抛出自制的错误
-        
-        
       }
     },
     // 错误接收及处理
@@ -92,13 +89,38 @@ export const errorConfig: RequestConfig = {
       }
     },
   },
+  // 此处为拦截器，每次发送请求之前判断能否取到token
+  // request.interceptors.request.use(async (url, options) => {
+  //   if (sessionStorage.getItem('token')) {
+  //     const headers = {
+  //       'Content-Type': 'application/json',
+  //       'Accept': 'application/json',
+  //       'Authorization': `Token ${sessionStorage.getItem('token')}`,
+  //     };
+  //     return {
+  //       url,
+  //       options: { ...options, headers },
+  //     };
+  //   }
+  // })
 
-  // 请求拦截器
+  // 请求拦截器  数组形式
   requestInterceptors: [
     (config: RequestOptions) => {
       // 拦截请求配置，进行个性化处理。
-      const url = config?.url?.concat('?token = hello');
-      return { ...config, url };
+      const token = localStorage.getItem('access_token');
+      config.headers = {
+        ...config.headers,
+        Authorization: `Bearer ${token}`,
+      };
+
+      // const url = `${config.url}?token=hello`;
+      // // config.url = `${config.url}?token=hello`;
+      // // const url = config?.url?.concat('?token = hello');
+      // return { ...config, headers: config.headers,url };
+      config.url = `${config.url}?token=hello`;
+
+      return { ...config, headers: { ...config.headers, Authorization: `Bearer ${token}` } };
     },
   ],
 

@@ -65,7 +65,7 @@ export default {
   'pages.searchTable.batchDeletion': '批量删除',
   'pages.searchTable.batchApproval': '批量审批',
 
-
   //自己添加的
-  'Fighting':'越努力越幸运'
+  Fighting: '越努力越幸运',
+  Email: '邮箱: super@a.com',
 };

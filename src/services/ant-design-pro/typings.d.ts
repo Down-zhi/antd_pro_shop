@@ -5,6 +5,8 @@ declare namespace API {
   type CurrentUser = {
     name?: string;
     avatar?: string;
+    avatar_url?: string; //接口定义的
+
     userid?: string;
     email?: string;
     signature?: string;
@@ -24,6 +26,7 @@ declare namespace API {
   };
 
   type LoginResult = {
+    [x: string]: any;
     status?: string;
     type?: string;
     currentAuthority?: string;
@@ -66,6 +69,8 @@ declare namespace API {
     password?: string;
     autoLogin?: boolean;
     type?: string;
+    access_token?: string; //接口添加
+    status?: string;
   };
 
   type ErrorResponse = {

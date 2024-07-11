@@ -1,26 +1,19 @@
 import { Footer } from '@/components';
 import { login } from '@/services/ant-design-pro/api';
-import { getFakeCaptcha } from '@/services/ant-design-pro/login';
 import {
   AlipayCircleOutlined,
   LockOutlined,
-  MobileOutlined,
   TaobaoCircleOutlined,
   UserOutlined,
   WeiboCircleOutlined,
 } from '@ant-design/icons';
-import {
-  LoginForm,
-  ProFormCaptcha,
-  ProFormCheckbox,
-  ProFormText,
-} from '@ant-design/pro-components';
-import { FormattedMessage, history, SelectLang, useIntl, useModel, Helmet } from '@umijs/max';
+import { LoginForm, ProFormCheckbox, ProFormText } from '@ant-design/pro-components';
+import { FormattedMessage, Helmet, history, SelectLang, useIntl, useModel } from '@umijs/max';
 import { Alert, message, Tabs } from 'antd';
-import Settings from '../../../../config/defaultSettings';
+import { createStyles } from 'antd-style';
 import React, { useState } from 'react';
 import { flushSync } from 'react-dom';
-import { createStyles } from 'antd-style';
+import Settings from '../../../../config/defaultSettings';
 
 const useStyles = createStyles(({ token }) => {
   return {
@@ -118,25 +111,47 @@ const Login: React.FC = () => {
     try {
       // 登录
       const msg = await login({ ...values, type });
-      if (msg.status === 'ok') {
+
+      if (msg && msg.access_token) {
+        localStorage.setItem('access_token', msg.access_token);
+      }
+      //别人的接口这样定义的
+      if (msg.status === undefined) {
         const defaultLoginSuccessMessage = intl.formatMessage({
           id: 'pages.login.success',
           defaultMessage: '登录成功！',
         });
         message.success(defaultLoginSuccessMessage);
         await fetchUserInfo();
+        // window.location.href返回的是当前页面的完整URL，new URL()构造函数则可以解析这个URL，而.searchParams属性则允许你访问URL中的查询参数。
+        //从URLSearchParams对象中获取名为'redirect'的查询参数的值，有就作为新的url路径
         const urlParams = new URL(window.location.href).searchParams;
         history.push(urlParams.get('redirect') || '/');
+        //问题： 这个参数是否在路由中设置重定向??
+        //  <Link to={'/'}  />  由于你的代码是在异步函数或事件处理器中运行的，<Link>组件并不会直接导致页面跳转，因为你并没有实际地渲染或更新任何React组件树。
+        // history.push('/admin/admin/sub-page')
         return;
       }
-      console.log(msg);
+      // setUserLoginState(msg.access.token);
+      // if (msg.status === 'ok') {
+      //   const defaultLoginSuccessMessage = intl.formatMessage({
+      //     id: 'pages.login.success',
+      //     defaultMessage: '登录成功！',
+      //   });
+      //   message.success(defaultLoginSuccessMessage);
+      //   await fetchUserInfo();
+      //   const urlParams = new URL(window.location.href).searchParams;
+      //   history.push(urlParams.get('redirect') || '/');
+      //   return;
+      // }
       // 如果失败去设置用户错误信息
-      setUserLoginState(msg);
+      setUserLoginState(msg.access.token);
     } catch (error) {
       const defaultLoginFailureMessage = intl.formatMessage({
         id: 'pages.login.failure',
         defaultMessage: '登录失败，请重试！',
       });
+
       console.log(error);
       message.error(defaultLoginFailureMessage);
     }
@@ -166,8 +181,10 @@ const Login: React.FC = () => {
             minWidth: 280,
             maxWidth: '75vw',
           }}
+          // 修改logo和标题
           logo={<img alt="logo" src="/logo.svg" />}
-          title="Ant Design"
+          title="GuoDaXia Admin"
+          // 自定义国际化id Fighting 中文是越努力越幸运
           subTitle={intl.formatMessage({ id: 'Fighting' })}
           initialValues={{
             autoLogin: true,
@@ -216,15 +233,18 @@ const Login: React.FC = () => {
           )}
           {type === 'account' && (
             <>
+              {/* 改成邮箱登录 */}
               <ProFormText
-                name="username"
+                // name="username"
+                name="email"
                 fieldProps={{
                   size: 'large',
                   prefix: <UserOutlined />,
                 }}
                 placeholder={intl.formatMessage({
-                  id: 'pages.login.username.placeholder',
-                  defaultMessage: '用户名: admin or user',
+                  id: 'Email',
+                  // defaultMessage: '用户名: admin or user',
+                  defaultMessage: '邮箱: super@a.com',
                 })}
                 rules={[
                   {
@@ -232,9 +252,14 @@ const Login: React.FC = () => {
                     message: (
                       <FormattedMessage
                         id="pages.login.username.required"
-                        defaultMessage="请输入用户名!"
+                        defaultMessage="请输入邮箱!"
+                        // defaultMessage="请输入用户名!"
                       />
                     ),
+                  },
+                  {
+                    type: 'email',
+                    message: '输入正确的邮箱格式',
                   },
                 ]}
               />
@@ -246,7 +271,7 @@ const Login: React.FC = () => {
                 }}
                 placeholder={intl.formatMessage({
                   id: 'pages.login.password.placeholder',
-                  defaultMessage: '密码: ant.design',
+                  defaultMessage: '密码: 123123',
                 })}
                 rules={[
                   {

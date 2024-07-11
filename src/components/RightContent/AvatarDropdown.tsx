@@ -16,8 +16,10 @@ export type GlobalHeaderRightProps = {
 
 export const AvatarName = () => {
   const { initialState } = useModel('@@initialState');
-  const { currentUser } = initialState || {};
-  return <span className="anticon">{currentUser?.name}</span>;
+  const { currentUser }: any = initialState || {};
+  const currentUserid = currentUser.find((user: { id: number }) => user.id === 22453);
+  const currentUserName = currentUserid ? currentUser.name : 'User not found';
+  return <span className="anticon">你好{currentUserName}</span>;
 };
 
 const useStyles = createStyles(({ token }) => {
