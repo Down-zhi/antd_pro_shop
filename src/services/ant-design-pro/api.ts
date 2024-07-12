@@ -14,6 +14,7 @@ export async function currentUser(options?: { [key: string]: any }) {
   return request<{
     data: API.CurrentUser;
   }>('/api/admin/users', {
+    //应该是user写错了但是暂时不改了
     method: 'GET',
     ...(options || {}),
   });
@@ -57,6 +58,13 @@ export async function Dashboard(options?: { [key: string]: any }) {
   return request<Record<string, any>>('/api/admin/index', {
     method: 'GET',
     ...(options || {}),
+  });
+}
+//获取用户列表
+export async function GetUsers(params: any) {
+  return request('/api/admin/users', {
+    method: 'GET',
+    params,
   });
 }
 

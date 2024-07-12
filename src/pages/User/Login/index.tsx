@@ -125,7 +125,7 @@ const Login: React.FC = () => {
         // window.location.href返回的是当前页面的完整URL，new URL()构造函数则可以解析这个URL，而.searchParams属性则允许你访问URL中的查询参数。
         //从URLSearchParams对象中获取名为'redirect'的查询参数的值，有就作为新的url路径
         const urlParams = new URL(window.location.href).searchParams;
-        history.push(urlParams.get('redirect') || '/');
+        history.push(urlParams.get('redirect') || '/welcome');
         //问题： 这个参数是否在路由中设置重定向??
         //  <Link to={'/'}  />  由于你的代码是在异步函数或事件处理器中运行的，<Link>组件并不会直接导致页面跳转，因为你并没有实际地渲染或更新任何React组件树。
         // history.push('/admin/admin/sub-page')

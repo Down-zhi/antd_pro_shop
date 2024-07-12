@@ -38,7 +38,9 @@ export async function getInitialState(): Promise<{
   const fetchUserInfo = async () => {
     // 检查本地存储中是否存在 userInfo
     const useInfo = localStorage.getItem('useInfo');
-    if (useInfo) {
+    console.log(useInfo);
+
+    if (useInfo && useInfo !== 'undefiend') {
       // 如果存在，解析并返回 userInfo
       return JSON.parse(useInfo);
     }

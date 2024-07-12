@@ -19,15 +19,30 @@ export default [
         name: 'login',
         path: '/user/login',
         component: './User/Login',
-        // redirect:'/admin/sub-page'
       },
     ],
   },
   {
+    path: '/',
+    component: './Welcome',
+  },
+  // {
+  //   path: '/welcome',
+  //   name: 'welcome',
+  //   icon: 'smile',
+  //   component: './Welcome',
+  // },
+  {
     path: '/dashboard',
-    name: '统计面板', //要在mean中加 其他语言的
+    name: '统计面板',
     icon: 'smile',
     component: './DashBoard',
+  },
+  {
+    name: '用户管理',
+    path: '/user/manage', //要在mean中加 其他语言的
+    icon: 'user',
+    component: './User/Manage',
   },
   {
     path: '/admin',
