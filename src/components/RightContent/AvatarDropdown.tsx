@@ -1,7 +1,7 @@
 import { outLogin } from '@/services/ant-design-pro/api';
 import { LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
-import { history, useModel } from '@umijs/max';
-import { Spin } from 'antd';
+import { history, useIntl, useModel } from '@umijs/max';
+import { message, Spin } from 'antd';
 import { createStyles } from 'antd-style';
 import { stringify } from 'querystring';
 import type { MenuInfo } from 'rc-menu/lib/interface';
@@ -17,9 +17,11 @@ export type GlobalHeaderRightProps = {
 export const AvatarName = () => {
   const { initialState } = useModel('@@initialState');
   const { currentUser }: any = initialState || {};
-  const currentUserid = currentUser.find((user: { id: number }) => user.id === 22453);
-  const currentUserName = currentUserid ? currentUser.name : 'User not found';
-  return <span className="anticon">你好{currentUserName}</span>;
+  const currentUserId = currentUser.find((user: { id: number }) => user.id === 22453); //筛选
+  // const currentUserName = currentUser ? JSON.stringify(currentUser.name) : 'User not found';
+  const currentUserName = currentUserId.name;
+  //currentUser 不是一个单一的对象，而是一个对象的集合。数组本身没有 name 属性
+  return <span className="anticon">{currentUserName}</span>;
 };
 
 const useStyles = createStyles(({ token }) => {
@@ -44,8 +46,18 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
   /**
    * 退出登录，并且将当前的 url 保存
    */
+  const intl = useIntl();
   const loginOut = async () => {
     await outLogin();
+    //请求成功 应该删除信息
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('useInfo');
+    const defaultLoginSuccessMessage = intl.formatMessage({
+      id: 'menu.account.logout',
+      // defaultMessage: '退出登录！',
+    });
+    message.success(defaultLoginSuccessMessage);
+
     const { search, pathname } = window.location;
     const urlParams = new URL(window.location.href).searchParams;
     /** 此方法会跳转到 redirect 参数所在的位置 */
@@ -88,6 +100,7 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
           marginRight: 8,
         }}
       />
+      loading
     </span>
   );
 
@@ -97,7 +110,7 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
 
   const { currentUser } = initialState;
 
-  if (!currentUser || !currentUser.name) {
+  if (!currentUser) {
     return loading;
   }
 

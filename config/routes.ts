@@ -24,6 +24,12 @@ export default [
     ],
   },
   {
+    path: '/dashboard',
+    name: '统计面板', //要在mean中加 其他语言的
+    icon: 'smile',
+    component: './DashBoard',
+  },
+  {
     path: '/admin',
     name: 'admin',
     icon: 'crown',

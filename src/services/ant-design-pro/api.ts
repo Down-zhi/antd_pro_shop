@@ -20,8 +20,14 @@ export async function currentUser(options?: { [key: string]: any }) {
 }
 
 /** 退出登录接口 POST /api/login/outLogin */
+// export async function outLogin(options?: { [key: string]: any }) {
+//   return request<Record<string, any>>('/api/login/outLogin', {
+//     method: 'POST',
+//     ...(options || {}),
+//   });
+// }
 export async function outLogin(options?: { [key: string]: any }) {
-  return request<Record<string, any>>('/api/login/outLogin', {
+  return request<Record<string, any>>('/api/auth/logout', {
     method: 'POST',
     ...(options || {}),
   });
@@ -45,6 +51,13 @@ export async function login(body: API.LoginParams, options?: { [key: string]: an
   //   data: body,
   //   ...(options || {}),
   // });
+}
+//获取统计面板数据
+export async function Dashboard(options?: { [key: string]: any }) {
+  return request<Record<string, any>>('/api/admin/index', {
+    method: 'GET',
+    ...(options || {}),
+  });
 }
 
 /** 此处后端没有提供注释 GET /api/notices */
@@ -79,10 +92,10 @@ export async function rule(
 export async function updateRule(options?: { [key: string]: any }) {
   return request<API.RuleListItem>('/api/rule', {
     method: 'POST',
-    data:{
+    data: {
       method: 'update',
       ...(options || {}),
-    }
+    },
   });
 }
 
@@ -90,10 +103,10 @@ export async function updateRule(options?: { [key: string]: any }) {
 export async function addRule(options?: { [key: string]: any }) {
   return request<API.RuleListItem>('/api/rule', {
     method: 'POST',
-    data:{
+    data: {
       method: 'post',
       ...(options || {}),
-    }
+    },
   });
 }
 
@@ -101,9 +114,9 @@ export async function addRule(options?: { [key: string]: any }) {
 export async function removeRule(options?: { [key: string]: any }) {
   return request<Record<string, any>>('/api/rule', {
     method: 'POST',
-    data:{
+    data: {
       method: 'delete',
       ...(options || {}),
-    }
+    },
   });
 }

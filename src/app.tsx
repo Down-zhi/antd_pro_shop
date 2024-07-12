@@ -18,27 +18,48 @@ export async function getInitialState(): Promise<{
   settings?: Partial<LayoutSettings>;
   currentUser?: API.CurrentUser;
   loading?: boolean;
-  fetchUserInfo?: () => Promise<API.CurrentUser | undefined>;
+  // fetchUserInfo?: () => Promise<API.CurrentUser | undefined>;
+  fetchUserInfo?: () => Promise<API.CurrentUser>;
 }> {
+  // const fetchUserInfo = async () => {
+  //   try {
+  //     const msg = await queryCurrentUser({
+  //       skipErrorHandler: true,
+  //     });
+  //     console.log(msg);
+  //     // console.log('页面跳转');
+  //     return msg.data;
+  //   } catch (error) {
+  //     history.push(loginPath);
+  //   }
+  //   localStorage.setItem('useInfo',JSON.stringify(msg.data))
+  //   return undefined;
+  // };
   const fetchUserInfo = async () => {
+    // 检查本地存储中是否存在 userInfo
+    const useInfo = localStorage.getItem('useInfo');
+    if (useInfo) {
+      // 如果存在，解析并返回 userInfo
+      return JSON.parse(useInfo);
+    }
     try {
-      const msg = await queryCurrentUser({
+      const response = await queryCurrentUser({
         skipErrorHandler: true,
       });
-      console.log(msg);
-
-      console.log('页面跳转');
-
-      return msg.data;
+      // 将获取的 userInfo 保存到本地存储中
+      localStorage.setItem('useInfo', JSON.stringify(response.data));
+      return response.data;
     } catch (error) {
+      // 错误处理，例如重定向到登录页面
       history.push(loginPath);
+      return undefined;
     }
-    return undefined;
   };
   // 如果不是登录页面，执行
   const { location } = history;
   if (location.pathname !== loginPath) {
-    const currentUser = await fetchUserInfo();
+    const currentUser = await fetchUserInfo(); //这里要把存储的json数据变成字符串
+    console.log('用户' + currentUser);
     return {
       fetchUserInfo,
       currentUser,
