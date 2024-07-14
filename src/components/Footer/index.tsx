@@ -11,7 +11,7 @@ const Footer: React.FC = () => {
       copyright={`${new Date().getFullYear()} 后台管理项目 `}
       links={[
         {
-          // key: 'Ant Design Pro',
+          key: 'GuoDaXia’s Blog',
           title: 'GuoDaXia’s Blog',
           href: 'https://next-blog-three-drab.vercel.app/',
           blankTarget: true,
@@ -23,7 +23,7 @@ const Footer: React.FC = () => {
           blankTarget: true,
         },
         {
-          // key: 'Ant Design',
+          key: 'Ant Design',
           title: '参考',
           href: 'https://pro.ant.design/zh-CN',
           blankTarget: true,

@@ -58,7 +58,7 @@ if (pwa) {
       <Button
         type="primary"
         onClick={() => {
-          notification.destroy(key);
+          // notification.destroy(key);
           reloadSW();
         }}
       >
@@ -87,5 +87,5 @@ if (pwa) {
     if (sw) sw.unregister();
   });
 
-  clearCache();
+  // clearCache();
 }

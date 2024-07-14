@@ -17,7 +17,7 @@ export type GlobalHeaderRightProps = {
 export const AvatarName = () => {
   const { initialState } = useModel('@@initialState');
   const { currentUser }: any = initialState || {};
-  const currentUserId = currentUser.find((user: { id: number }) => user.id === 22453); //筛选
+  const currentUserId = currentUser.find((user: { id: number }) => user.id === 22459); //筛选
   // const currentUserName = currentUser ? JSON.stringify(currentUser.name) : 'User not found';
   const currentUserName = currentUserId.name;
   //currentUser 不是一个单一的对象，而是一个对象的集合。数组本身没有 name 属性

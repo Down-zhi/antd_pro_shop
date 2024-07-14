@@ -27,11 +27,18 @@ const Index: React.FC = () => {
   );
 
   const [data, setData] = useState<any>();
-  useEffect(async () => {
-    //发送请求获取统计数据
-    const res = await Dashboard();
-    //得到数据后，更新组件状态
-    setData(res);
+  useEffect(() => {
+    const GetData = async () => {
+      try {
+        //发送请求获取统计数据
+        const res = await Dashboard();
+        //得到数据后，更新组件状态
+        setData(res);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    GetData();
   }, []);
   if (!data) {
     return loading;

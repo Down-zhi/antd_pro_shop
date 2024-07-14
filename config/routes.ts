@@ -34,15 +34,21 @@ export default [
   // },
   {
     path: '/dashboard',
-    name: '统计面板',
+    name: 'dashboard',
     icon: 'smile',
     component: './DashBoard',
   },
   {
-    name: '用户管理',
+    name: 'usemanage',
     path: '/user/manage', //要在mean中加 其他语言的
     icon: 'user',
     component: './User/Manage',
+  },
+  {
+    name: 'goods',
+    path: '/goods', //要在mean中加 其他语言的
+    icon: 'shop',
+    component: './Goods',
   },
   {
     path: '/admin',

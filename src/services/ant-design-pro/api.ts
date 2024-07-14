@@ -67,7 +67,32 @@ export async function GetUsers(params: any) {
     params,
   });
 }
-
+//是否启用
+export async function lockUser(uid: any) {
+  return request(`/api/admin/users/${uid}/lock`, {
+    method: 'PATCH',
+  });
+}
+//添加用户
+export async function addUser(data: any) {
+  return request('/api/admin/users', {
+    method: 'POST',
+    data,
+  });
+}
+//用户详情
+export async function showUser(editId: any) {
+  return request(`/api/admin/users/${editId}`, {
+    method: 'GET',
+  });
+}
+//更新用户
+export async function updateUser(editId: any, data: any) {
+  return request(`/api/admin/users/${editId}`, {
+    method: 'PUT',
+    data,
+  });
+}
 /** 此处后端没有提供注释 GET /api/notices */
 export async function getNotices(options?: { [key: string]: any }) {
   return request<API.NoticeIconList>('/api/notices', {

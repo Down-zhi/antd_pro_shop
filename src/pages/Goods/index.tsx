@@ -1,10 +1,12 @@
-import { GetUsers, lockUser, updateUser } from '@/services/ant-design-pro/api';
+import { GetGoods, UporDown } from '@/services/ant-design-pro/goodsapi';
+import { updateUser } from '@/services/swagger/user';
 import { PlusOutlined } from '@ant-design/icons';
 import { PageContainer, ProColumns, ProTable, TableDropdown } from '@ant-design/pro-components';
-import { Avatar, Button, Switch } from 'antd';
+import { Button, Image, Switch } from 'antd';
 import message from 'antd/lib/message';
 import React, { useRef, useState } from 'react';
-import AddandEdit from './AddandEdit';
+import AddGoods from './AddGoods';
+
 const Index: React.FC = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editId, setEditId] = useState(undefined);
@@ -19,31 +21,34 @@ const Index: React.FC = () => {
     }[];
     state: string;
     comments: number;
+    description: string;
     created_at: string;
     updated_at: string;
     closed_at?: string;
-    avatar_url: any;
-    is_locked: any;
+    cover_url: any;
+    is_on: any;
   };
-  const actionRef = useRef<any>();
-  // 获取用户数据
+  const actionRef = useRef<any>(); //用于在父组件中获取ProTable实例的引用，从而可以访问其内部的方法和属性。
+  // 获取商品数据列表
   const getData = async (params: any) => {
-    const response = await GetUsers(params);
+    const response = await GetGoods(params);
     return {
       data: response.data,
       success: true,
-      // total:response.meta.pagination.total  //分页要用 由于太多数据就不用这个了
+      //   total:response.meta.pagination.total  //分页要用 由于太多数据就不用这个了
     };
   };
-  // 是否启用用户
-  const handleLockUser = async (uid: any) => {
-    const response = await lockUser(uid);
+  // 是否上架
+  const handleUporDown = async (uid: any) => {
+    const response = await UporDown(uid);
     if (response.status === undefined) message.success('操作成功');
   };
+
   const isShowModal = (show: boolean | ((prevState: boolean) => boolean), id = undefined) => {
     setEditId(id);
     setIsModalVisible(show);
   };
+
   const handleUpdate = async (uid: any, values: Record<string, any>) => {
     const response = await updateUser(uid, values);
     if (response.status === undefined) {
@@ -52,6 +57,7 @@ const Index: React.FC = () => {
     }
   };
 
+  //去参考 https://procomponents.ant.design/components/table#columns-%E5%88%97%E5%AE%9A%E4%B9%89
   const columns: ProColumns<GithubIssueItem>[] = [
     {
       dataIndex: 'index',
@@ -59,31 +65,49 @@ const Index: React.FC = () => {
       width: 48,
     },
     {
-      title: '头像',
-      dataIndex: 'avatar_url',
+      title: '商品图',
+      dataIndex: 'cover_url',
+      width: '70px',
       hideInSearch: true,
+      editable: false, // 设置在编辑时是否可编辑 如果api中没有这一项的数据更新 可用设置不可改变，虽然自己修改也不会报错但是数据并没有被修改刷新后不会改变
       render: (_, record) => {
-        return <Avatar size={32} src={record.avatar_url} />;
+        return <Image width={100} src={record.cover_url} />;
       },
     },
     {
-      title: '姓名',
-      dataIndex: 'name',
+      title: '标题',
+      width: '40px',
+      dataIndex: 'title',
     },
     {
-      title: '邮箱',
-      dataIndex: 'email',
-    },
-    {
-      title: '是否启用',
-      dataIndex: 'is_locked',
+      title: '价格',
+      dataIndex: 'price',
       hideInSearch: true,
+    },
+    {
+      title: '库存',
+      dataIndex: 'stock',
+      hideInSearch: true,
+    },
+    {
+      title: '销量',
+      dataIndex: 'sales',
+      hideInSearch: true,
+    },
+    {
+      title: '是否上架',
+      dataIndex: 'is_on',
+      valueType: 'radioButton',
+      valueEnum: {
+        0: { text: '未上架' },
+        1: { text: '已上架' },
+      },
       render: (_, record) => (
         <Switch
-          checkedChildren="启用"
-          unCheckedChildren="禁用"
-          defaultChecked={record.is_locked === 0}
-          onChange={() => handleLockUser(record.id)}
+          checkedChildren="上架"
+          unCheckedChildren="下架"
+          defaultChecked={record.is_on === 1}
+          onChange={() => handleUporDown(record.id)}
         />
       ),
     },
@@ -106,7 +130,13 @@ const Index: React.FC = () => {
         >
           编辑
         </a>,
-        <a href={record.url} target="_blank" rel="noopener noreferrer" key="view">
+        <a
+          target="_blank"
+          rel="noopener noreferrer"
+          key="view"
+          // onClick={() => showModal(record)}
+          // action?.pageInfo?(record.description)||null }}
+        >
           查看
         </a>,
         <TableDropdown
@@ -175,7 +205,7 @@ const Index: React.FC = () => {
           },
         }}
         pagination={{
-          pageSize: 10,
+          //   pageSize: 10,
           onChange: (page) => console.log(page),
         }}
         dateFormatter="string"
@@ -219,7 +249,7 @@ const Index: React.FC = () => {
         !isModalVisible ? (
           ''
         ) : (
-          <AddandEdit
+          <AddGoods
             isModalVisible={isModalVisible}
             isShowModal={isShowModal}
             actionRef={actionRef}
