@@ -10,6 +10,7 @@ export default {
   'menu.dashboard': '统计面板',
   'menu.usemanage': '用户管理',
   'menu.goods': '商品管理',
+  'menu.category': '分类管理',
   'menu.dashboard.analysis': '分析页',
   'menu.dashboard.monitor': '监控页',
   'menu.dashboard.workplace': '工作台',

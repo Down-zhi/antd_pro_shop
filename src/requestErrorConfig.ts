@@ -1,6 +1,7 @@
 ﻿import type { RequestOptions } from '@@/plugin-request/request';
-import type { RequestConfig } from '@umijs/max';
+import { type RequestConfig } from '@umijs/max';
 import { message, notification } from 'antd';
+import { history } from 'umi';
 
 // 错误处理方案： 错误类型
 enum ErrorShowType {
@@ -26,6 +27,7 @@ interface ResponseStructure {
  */
 export const errorConfig: RequestConfig = {
   // 错误处理： umi@3 的错误处理方案。
+
   errorConfig: {
     // 错误抛出
     errorThrower: (res) => {
@@ -45,6 +47,19 @@ export const errorConfig: RequestConfig = {
     },
     // 错误接收及处理
     errorHandler: (error: any, opts: any) => {
+      //如果token过期 退出登录，从新获取新的token
+      const { response } = error;
+      const { status } = response;
+      if (status === 401) {
+        // 删除本地存储的token和userInfo
+        //  outLogin();
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('userInfo');
+
+        // 跳转到登录重新登录
+        history.push('/user/login');
+      }
+
       if (opts?.skipErrorHandler) throw error;
       // 我们的 errorThrower 抛出的错误。
       if (error.name === 'BizError') {
@@ -113,7 +128,6 @@ export const errorConfig: RequestConfig = {
         ...config.headers,
         Authorization: `Bearer ${token}`,
       };
-
       // const url = `${config.url}?token=hello`;
       // // config.url = `${config.url}?token=hello`;
       // // const url = config?.url?.concat('?token = hello');

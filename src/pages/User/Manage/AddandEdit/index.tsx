@@ -1,8 +1,7 @@
-import AliyunOSS from '@/components/AliyunOSS';
 import { addUser, showUser, updateUser } from '@/services/ant-design-pro/api';
-import { UploadOutlined } from '@ant-design/icons';
+
 import { ProForm, ProFormText } from '@ant-design/pro-components';
-import { Button, message, Modal, Skeleton } from 'antd';
+import { message, Modal, Skeleton } from 'antd';
 import { useEffect, useState } from 'react';
 interface Props {
   isModalVisible: any;
@@ -27,6 +26,8 @@ function Index(props: Props) {
         // 发送请求, 获取用户详情
         if (editId !== undefined) {
           const response = await showUser(editId);
+          console.log(response);
+
           // 获取数据之后, 修改状态, 状态改变, 组件重新渲染, 骨架屏消失, 编辑表单出现
           setInitialValues({
             name: response.name,
@@ -46,7 +47,6 @@ function Index(props: Props) {
       // 执行添加
       // 发送请求, 添加用户
       response = await addUser(values);
-      console.log(response);
     } else {
       // 执行编辑
       // 发送请求, 更新用户
@@ -106,17 +106,21 @@ function Index(props: Props) {
                 />
               )
             }
+            {/* <ProForm.Item
+              name="cover"
+              label="商品主图"
+              rules={[{ required: true, message: '请上传商品主图' }]}
+            >
+              <AliyunOSS
+                  accept="image/*" setCoverKey={undefined} showUploadList={false}  
+              //   showUploadList={true}
+              >
+                <Button icon={<UploadOutlined />}>点击上传商品主图</Button>
+              </AliyunOSS>
+            </ProForm.Item> */}
           </ProForm>
         )
       }
-
-      <AliyunOSS
-        accept="image/*"
-        //   setCoverKey={setCoverKey}
-        //   showUploadList={true}
-      >
-        <Button icon={<UploadOutlined />}>点击上传商品主图</Button>
-      </AliyunOSS>
     </Modal>
   );
 }

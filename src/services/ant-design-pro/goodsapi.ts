@@ -16,7 +16,10 @@ export async function UporDown(uid: any) {
 }
 //获取商品详情
 export async function showGoods(editId: any) {
-  return request(`/api/admin/goods/${editId}?include=category`, {
+  return request(`/api/admin/goods/${editId}?include=category,`, {
+    // headers: {
+    //   inlude: 'category', // 注意键名的大小写，这里假设服务器端接受的是'Inlude'
+    // },
     method: 'GET',
   });
 }

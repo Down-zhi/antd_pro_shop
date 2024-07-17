@@ -1,15 +1,15 @@
 import { GetGoods, UporDown } from '@/services/ant-design-pro/goodsapi';
-import { updateUser } from '@/services/swagger/user';
 import { PlusOutlined } from '@ant-design/icons';
 import { PageContainer, ProColumns, ProTable, TableDropdown } from '@ant-design/pro-components';
 import { Button, Image, Switch } from 'antd';
 import message from 'antd/lib/message';
-import React, { useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import AddGoods from './AddGoods';
 
-const Index: React.FC = () => {
+const Index = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editId, setEditId] = useState(undefined);
+  const [data, setData] = useState<any>([]);
   type GithubIssueItem = {
     url: string;
     id: any;
@@ -29,13 +29,15 @@ const Index: React.FC = () => {
     is_on: any;
   };
   const actionRef = useRef<any>(); //用于在父组件中获取ProTable实例的引用，从而可以访问其内部的方法和属性。
+
   // 获取商品数据列表
   const getData = async (params: any) => {
     const response = await GetGoods(params);
+    setData(response.data);
     return {
       data: response.data,
       success: true,
-      //   total:response.meta.pagination.total  //分页要用 由于太多数据就不用这个了
+      // total:response.meta.pagination.total  //分页要用 由于太多数据就不用这个了
     };
   };
   // 是否上架
@@ -48,14 +50,21 @@ const Index: React.FC = () => {
     setEditId(id);
     setIsModalVisible(show);
   };
-
-  const handleUpdate = async (uid: any, values: Record<string, any>) => {
-    const response = await updateUser(uid, values);
-    if (response.status === undefined) {
-      message.success(`更新成功`);
-      actionRef.current.reload();
-    }
+  // 没什么屌用
+  const handleDelete = (id: any) => {
+    const newData = data.filter((item: { id: any }) => item.id !== id);
+    setData(newData);
   };
+  // const handleUpdate = async (uid: any, values: Record<string, any>) => {
+  //   const response = await updateUser(uid, values);
+  //   if (response.status === undefined) {
+  //     message.success(`更新成功`);
+  //     actionRef.current.reload();
+  //   }
+  // };
+  // function handleDelete(id:any){
+
+  // }
 
   //去参考 https://procomponents.ant.design/components/table#columns-%E5%88%97%E5%AE%9A%E4%B9%89
   const columns: ProColumns<GithubIssueItem>[] = [
@@ -69,7 +78,7 @@ const Index: React.FC = () => {
       dataIndex: 'cover_url',
       width: '70px',
       hideInSearch: true,
-      editable: false, // 设置在编辑时是否可编辑 如果api中没有这一项的数据更新 可用设置不可改变，虽然自己修改也不会报错但是数据并没有被修改刷新后不会改变
+      // editable: false, // 设置在编辑时是否可编辑 如果api中没有这一项的数据更新 可用设置不可改变，虽然自己修改也不会报错但是数据并没有被修改刷新后不会改变
       render: (_, record) => {
         return <Image width={100} src={record.cover_url} />;
       },
@@ -122,19 +131,26 @@ const Index: React.FC = () => {
       key: 'option',
       render: (text, record, _, action) => [
         <a
-          key="editable"
-          // onClick={ () => isShowModal(true, record.id) }
-          onClick={() => {
-            action?.startEditable?.(record.id);
-          }}
+          key=""
+          onClick={() => isShowModal(true, record.id)}
+          // onClick={() => {
+          //   action?.startEditable?.(record.id); 用自带的可编辑展示框
+          // }}
         >
           编辑
+        </a>,
+        <a
+          key=""
+          // onClick={ () => record.filter((item:any)=>item.id!==record.id) }
+          onClick={() => handleDelete(record.id)}
+        >
+          删除
         </a>,
         <a
           target="_blank"
           rel="noopener noreferrer"
           key="view"
-          // onClick={() => showModal(record)}
+          // onClick={() => isShowModal(true,record)}
           // action?.pageInfo?(record.description)||null }}
         >
           查看
@@ -150,10 +166,6 @@ const Index: React.FC = () => {
       ],
     },
   ];
-
-  function handleDelete(): Promise<any> {
-    throw message.error('还没有权限');
-  }
 
   return (
     <PageContainer>
@@ -171,18 +183,13 @@ const Index: React.FC = () => {
         //     });
         // }}
         request={async (params) => getData(params)}
-        editable={{
-          type: 'multiple',
-          onSave: handleUpdate, //不能用这个表格的编辑功能 因为后台更新只能更新两个内容 但是自带编辑框会更改所以类
-          onDelete: handleDelete,
-        }}
-        columnsState={{
-          persistenceKey: 'pro-table-singe-demos',
-          persistenceType: 'localStorage',
-          defaultValue: {
-            option: { fixed: 'right', disable: true },
-          },
-        }}
+        // columnsState={{
+        //   persistenceKey: 'pro-table-singe-demos',
+        //   persistenceType: 'localStorage',
+        //   defaultValue: {
+        //     option: { fixed: 'right', disable: true },
+        //   },
+        // }}
         rowKey="id"
         search={{
           labelWidth: 'auto',
@@ -192,24 +199,23 @@ const Index: React.FC = () => {
             listsHeight: 400,
           },
         }}
-        form={{
-          // 由于配置了 transform，提交的参数与定义的不同这里需要转化一下
-          syncToUrl: (values, type) => {
-            if (type === 'get') {
-              return {
-                ...values,
-                created_at: [values.startTime, values.endTime],
-              };
-            }
-            return values;
-          },
-        }}
+        // form={{
+        //   // 由于配置了 transform，提交的参数与定义的不同这里需要转化一下
+        //   syncToUrl: (values, type) => {
+        //     if (type === 'get') {
+        //       return {
+        //         ...values,
+        //         created_at: [values.startTime, values.endTime],
+        //       };
+        //     }
+        //     return values;
+        //   },
+        // }}
         pagination={{
-          //   pageSize: 10,
-          onChange: (page) => console.log(page),
+          pageSize: 10,
         }}
         dateFormatter="string"
-        headerTitle="用户列表"
+        headerTitle="商品列表"
         toolBarRender={() => [
           <Button
             key="button"

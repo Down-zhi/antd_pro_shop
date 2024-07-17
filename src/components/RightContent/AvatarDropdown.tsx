@@ -1,3 +1,4 @@
+import Changepw from '@/pages/User/Changepw';
 import { outLogin } from '@/services/ant-design-pro/api';
 import { LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
 import { history, useIntl, useModel } from '@umijs/max';
@@ -5,10 +6,9 @@ import { message, Spin } from 'antd';
 import { createStyles } from 'antd-style';
 import { stringify } from 'querystring';
 import type { MenuInfo } from 'rc-menu/lib/interface';
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { flushSync } from 'react-dom';
 import HeaderDropdown from '../HeaderDropdown';
-
 export type GlobalHeaderRightProps = {
   menu?: boolean;
   children?: React.ReactNode;
@@ -17,7 +17,7 @@ export type GlobalHeaderRightProps = {
 export const AvatarName = () => {
   const { initialState } = useModel('@@initialState');
   const { currentUser }: any = initialState || {};
-  const currentUserId = currentUser.find((user: { id: number }) => user.id === 22459); //筛选
+  const currentUserId = currentUser.find((user: { id: number }) => user.id === 22479); //筛选
   // const currentUserName = currentUser ? JSON.stringify(currentUser.name) : 'User not found';
   const currentUserName = currentUserId.name;
   //currentUser 不是一个单一的对象，而是一个对象的集合。数组本身没有 name 属性
@@ -43,9 +43,8 @@ const useStyles = createStyles(({ token }) => {
 });
 
 export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, children }) => {
-  /**
-   * 退出登录，并且将当前的 url 保存
-   */
+  // 退出登录，并且将当前的 url 保存
+
   const intl = useIntl();
   const loginOut = async () => {
     await outLogin();
@@ -72,10 +71,14 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
       });
     }
   };
+
   const { styles } = useStyles();
 
   const { initialState, setInitialState } = useModel('@@initialState');
-
+  const [showChangePw, setShowChangePw] = useState(false);
+  const isShowModal = (show: boolean | ((prevState: boolean) => boolean)) => {
+    setShowChangePw(show);
+  };
   const onMenuClick = useCallback(
     (event: MenuInfo) => {
       const { key } = event;
@@ -86,7 +89,10 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
         loginOut();
         return;
       }
-      history.push(`/account/${key}`);
+      if (key === 'update') {
+        isShowModal(true);
+      }
+      // history.push(`/account/${key}`);
     },
     [setInitialState],
   );
@@ -137,17 +143,33 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
       icon: <LogoutOutlined />,
       label: '退出登录',
     },
+    {
+      key: 'update',
+      icon: <LogoutOutlined />,
+      label: '修改密码',
+    },
   ];
 
   return (
-    <HeaderDropdown
-      menu={{
-        selectedKeys: [],
-        onClick: onMenuClick,
-        items: menuItems,
-      }}
-    >
-      {children}
-    </HeaderDropdown>
+    <div>
+      <HeaderDropdown
+        menu={{
+          selectedKeys: [],
+          onClick: onMenuClick,
+          items: menuItems,
+        }}
+      >
+        {children}
+      </HeaderDropdown>
+      {!showChangePw ? (
+        ''
+      ) : (
+        <Changepw
+          isModalVisible={showChangePw}
+          isShowModal={isShowModal}
+          // actionRef={actionRef}
+        />
+      )}
+    </div>
   );
 };

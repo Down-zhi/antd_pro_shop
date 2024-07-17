@@ -26,16 +26,10 @@ export default [
     path: '/',
     component: './Welcome',
   },
-  // {
-  //   path: '/welcome',
-  //   name: 'welcome',
-  //   icon: 'smile',
-  //   component: './Welcome',
-  // },
   {
     path: '/dashboard',
     name: 'dashboard',
-    icon: 'smile',
+    icon: 'PieChart',
     component: './DashBoard',
   },
   {
@@ -51,10 +45,16 @@ export default [
     component: './Goods',
   },
   {
+    name: 'category',
+    path: '/category', //要在mean中加 其他语言的
+    icon: 'AppstoreAdd',
+    component: './Category',
+  },
+  {
     path: '/admin',
     name: 'admin',
     icon: 'crown',
-    // access: 'Boss1',  //设置谁能进入这个页面的
+    access: 'Boss1', //设置谁能进入这个页面的
 
     routes: [
       {

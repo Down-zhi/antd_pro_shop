@@ -1,20 +1,16 @@
-//添加商品必须填的字段
+import AliyunOSS from '@/components/AliyunOSS';
+import Editor from '@/components/Editor';
+import { getcategory } from '@/services/ant-design-pro/category';
+import { addGoods, showGoods, updateGoods } from '@/services/ant-design-pro/goodsapi';
+import { UploadOutlined } from '@ant-design/icons';
 import { ProForm, ProFormDigit, ProFormText, ProFormTextArea } from '@ant-design/pro-components';
 import { Button, Cascader, Image, message, Modal, Skeleton } from 'antd';
 import { useEffect, useState } from 'react';
 
-// import AliyunOSSUpload from '@/components/AliyunOSSUpload'
-import { getCategory } from '@/services/ant-design-pro/category';
-import { UploadOutlined } from '@ant-design/icons';
-// import { fromPairs } from 'lodash';
-import AliyunOSS from '@/components/AliyunOSS';
-import { addGoods, showGoods } from '@/services/ant-design-pro/goodsapi';
-// import Editor from  '@/components/Editor'
-
 const AddGoods = (props: any) => {
   // 将表单初始化的值设置成状态, 在编辑的时候, 使用这个状态
   const [initialValues, setInitialValues] = useState<any>(undefined);
-  const [options, setOptions] = useState([]);
+  const [options, setOptions] = useState<any>([]);
 
   // 定义Form实例, 用来操作表单
   const [formObj] = ProForm.useForm();
@@ -25,19 +21,23 @@ const AddGoods = (props: any) => {
   const { isShowModal } = props; // 操作模态框显示隐藏的方法
   const { actionRef } = props; // 父组件传过来的表格的引用, 可以用来操作表格, 比如刷新表格
   const { editId } = props; // 要编辑的ID, 添加的时候是undefined, 只有编辑才有
+  const type = editId === undefined ? '添加' : '编辑';
   useEffect(() => {
     // 查询分类数据
     const fetchData = async () => {
       try {
-        const resCategory = await getCategory();
+        const resCategory = await getcategory();
         if (resCategory.status === undefined) setOptions(resCategory); //在获取数据后想在组件中使用这个值就用useState设置状态
+        console.log(options);
+
         // 发送请求, 获取商品详情
         if (editId !== undefined) {
           const response = await showGoods(editId);
-          console.log(response);
-          // 获取数据之后, 修改状态, 状态改变, 组件重新渲染, 骨架屏消失, 编辑表单出现
-          const { pid, id } = response.category;
-          const defaultCategory = pid === 0 ? [id] : [pid, id];
+          // 通过id修改商品详情
+          //妈的气死l category不返回 要在请求时额外请求，但是额外请求一个还不行，请求两个才返回什么意思？为什么要加,才返回
+          const { pid, id } = response.category; //id是第一层 ，pid子集
+          const defaultCategory = [pid, id];
+
           setInitialValues({ ...response, category_id: defaultCategory });
         }
       } catch (error) {
@@ -48,40 +48,43 @@ const AddGoods = (props: any) => {
   }, []);
 
   //   文件上传成功后, 设置cover字段的value
-  // const setCoverKey = (fileKey: any) => formObj.setFieldsValue({ 'cover': fileKey })
+  const setCoverKey = (fileKey: any) => formObj.setFieldsValue({ cover: fileKey });
 
   //  编辑输入内容后, 设置details字段的value
-  // const setDetails = content => formObj.setFieldsValue({ 'details': content })
+  const setDetails = (content: any) => formObj.setFieldsValue({ details: content });
 
-  const handleSubmit = async (values) => {
+  const handleSubmit = async (values: { category_id: any[] }) => {
+    let response;
+    console.log('editid' + editId);
+
     if (editId === undefined) {
       // 执行添加
-      // 发送请求, 添加商品
-      const response = await addGoods({ ...values, category_id: values.category_id[1] });
-      if (response) {
-        message.success(`添加成功`);
-        // 刷新表格数据
-        actionRef.current.reload();
-        // 关闭模态框
-        isShowModal(false);
-      }
+      response = await addGoods({ ...values, category_id: values.category_id[1] });
+    } else {
+      // 发送请求, 更新商品
+      response = await updateGoods(editId, { ...values, category_id: values.category_id[1] });
     }
-    // else { // 执行编辑
-    //   // 发送请求, 更新商品
-    //   response = await updateGoods(editId, {...values, category_id: values.category_id[1]})
-    // }
+
+    if (response.status === undefined) {
+      message.success(`${type}成功`);
+      // 刷新表格数据
+      actionRef.current.reload();
+      // 关闭模态框
+      isShowModal(false);
+    }
   };
 
   return (
     <Modal
-      title={`添加商品`}
+      title={`${type}商品`}
       open={isModalVisible}
       onCancel={() => isShowModal(false)}
       footer={null}
+      width={800}
       destroyOnClose={true}
     >
       {
-        // 只有是编辑的情况下, 并且要显示的数据还没有返回, 才显示骨架屏
+        // 只有是编辑的情况下, 并且要显示的数据还没有返回,
         initialValues === undefined && editId !== undefined ? (
           <Skeleton active={true} paragraph={{ rows: 4 }} />
         ) : (
@@ -145,8 +148,8 @@ const AddGoods = (props: any) => {
               <div>
                 <AliyunOSS
                   accept="image/*"
-                  //   setCoverKey={setCoverKey}
-                  //   showUploadList={true}
+                  setCoverKey={setCoverKey} //   setCoverKey={setCoverKey}
+                  showUploadList={true}
                 >
                   <Button icon={<UploadOutlined />}>点击上传商品主图</Button>
                 </AliyunOSS>
@@ -164,10 +167,9 @@ const AddGoods = (props: any) => {
               label="商品详情"
               rules={[{ required: true, message: '请输入详情' }]}
             >
-              {/* <Editor
-                setDetails={setDetails}
-                content={initialValues === undefined ? '' : initialValues.details}
-              /> */}
+              <div>
+                <Editor setDetails={setDetails} content={initialValues?.details} />
+              </div>
             </ProForm.Item>
           </ProForm>
         )

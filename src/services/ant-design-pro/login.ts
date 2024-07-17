@@ -19,3 +19,10 @@ export async function getFakeCaptcha(
     ...(options || {}),
   });
 }
+
+export async function Changepassword(data: any) {
+  return request('/api/auth/password/update', {
+    method: 'POST',
+    data,
+  });
+}

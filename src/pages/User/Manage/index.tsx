@@ -73,6 +73,9 @@ const Index: React.FC = () => {
     {
       title: '邮箱',
       dataIndex: 'email',
+      copyable: true,
+      ellipsis: true,
+      tooltip: '过长会自动收缩',
     },
     {
       title: '是否启用',
@@ -114,7 +117,7 @@ const Index: React.FC = () => {
           onSelect={() => action?.reload()}
           menus={[
             { key: 'copy', name: '复制' },
-            { key: 'delete', name: '删除' },
+            // { key: 'delete', name: '删除' },
           ]}
         />,
       ],
